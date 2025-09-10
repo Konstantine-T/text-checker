@@ -31,6 +31,7 @@ interface MenuItem {
 const StyledListItem = styled(ListItem, {
   shouldForwardProp: (prop) => prop !== "active",
 })<StyledListItemProps>(({ active }) => ({
+  position: "relative",
   padding: "14px 11px",
   borderRadius: "30px 0 0 30px",
   cursor: "pointer",
@@ -39,6 +40,7 @@ const StyledListItem = styled(ListItem, {
   fontWeight: 700,
   "&:hover": !active
     ? {
+        zIndex: 10,
         backgroundColor: "rgba(255,255,255,0.1)",
         color: "white",
       }
@@ -138,6 +140,37 @@ const SidebarContent: React.FC<{ menuItems: MenuItem[] }> = ({ menuItems }) => {
                   fontWeight: 700,
                 }}
               />
+              {activeItem === item.id && (
+                <Box
+                  sx={{
+                    width: "16px",
+                    height: "calc(100% + 20px)",
+                    backgroundColor: "#ffff",
+                    color: "transparent",
+                    position: "absolute",
+                    right: 0,
+                    borderRadius: "0.5rem 0 0 0.5rem",
+                    "&::before, &::after": {
+                      content: '""',
+                      position: "absolute",
+                      right: 0,
+                      width: "20px",
+                      height: "20px",
+                      backgroundColor: "transparent",
+                    },
+                    "&::before": {
+                      top: "-20px",
+                      boxShadow: "0 10px 0 0 #132450",
+                      borderBottomRightRadius: "0.5rem",
+                    },
+                    "&::after": {
+                      bottom: "-20px",
+                      boxShadow: "0 -10px 0 0 #132450",
+                      borderTopRightRadius: "0.5rem",
+                    },
+                  }}
+                ></Box>
+              )}
             </StyledListItem>
           ))}
         </List>
