@@ -36,7 +36,6 @@ const StyledListItem = styled(ListItem, {
   borderRadius: "30px 0 0 30px",
   cursor: "pointer",
   color: active ? "#132450" : "rgba(255,255,255,0.7)",
-  transition: "all 0.2s ease",
   fontWeight: 700,
   "&:hover": !active
     ? {
