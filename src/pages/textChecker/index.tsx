@@ -2,34 +2,44 @@ import React, { useState } from "react";
 import {
   Box,
   Typography,
-  TextField,
   Button,
   Select,
   MenuItem,
   FormControl,
   Checkbox,
+  useMediaQuery,
 } from "@mui/material";
+import PlusIcon from "./svgs/PlusIcon";
+import RefreshIcon from "./svgs/RefreshIcon";
+import type { DiffItem } from "./types";
+import { computeDiff } from "./utils/diffUtils";
+import { TextInput } from "./components/TextInput";
 
 const TextComparison: React.FC = () => {
-  const [language, setLanguage] = useState<string>("ka");
+  const isMobile = useMediaQuery("(max-width:320px)");
   const [leftText, setLeftText] = useState<string>("");
   const [rightText, setRightText] = useState<string>("");
+  const [leftDiff, setLeftDiff] = useState<DiffItem[]>([]);
+  const [rightDiff, setRightDiff] = useState<DiffItem[]>([]);
+  const [showResults, setShowResults] = useState<boolean>(false);
 
   const handleCompare = () => {
-    // Add comparison logic here
-    console.log("Comparing texts:", { leftText, rightText });
-  };
+    if (!leftText.trim() || !rightText.trim()) {
+      return;
+    }
 
-  const handleAddContent = () => {
-    // Add content logic here
-    console.log("Adding content");
+    const { left, right } = computeDiff(leftText, rightText);
+    setLeftDiff(left);
+    setRightDiff(right);
+    setShowResults(true);
   };
 
   return (
     <Box
       sx={{
         width: "100%",
-        padding: "24px",
+        padding: isMobile ? "16px" : "24px",
+        height: "100vh",
         margin: "0 auto",
         fontFamily: "Roboto, Arial, sans-serif",
       }}
@@ -37,8 +47,10 @@ const TextComparison: React.FC = () => {
       <Box
         sx={{
           display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          flexDirection: isMobile ? "column" : "row",
+          justifyContent: isMobile ? "flex-start" : "space-between",
+          alignItems: isMobile ? "stretch" : "center",
+          gap: isMobile ? "16px" : "0",
           marginBottom: "24px",
           paddingBottom: "16px",
           borderBottom: "1px solid #EDEDED",
@@ -47,17 +59,18 @@ const TextComparison: React.FC = () => {
         <Box
           sx={{
             display: "flex",
-            alignItems: "center",
-            gap: "24px",
+            flexDirection: isMobile ? "column" : "row",
+            alignItems: isMobile ? "stretch" : "center",
+            gap: isMobile ? "12px" : "24px",
           }}
         >
           <FormControl>
             <Select
-              value={language}
+              value={"ka"}
               variant="outlined"
               size="small"
               sx={{
-                minWidth: "150px",
+                minWidth: isMobile ? "100%" : "150px",
                 backgroundColor: "white",
 
                 "& .MuiOutlinedInput-notchedOutline": {
@@ -96,68 +109,60 @@ const TextComparison: React.FC = () => {
           </Box>
         </Box>
         <Button
-          onClick={handleAddContent}
           sx={{
             backgroundColor: "#6c757d",
             color: "white",
             padding: "8px 16px",
+            width: isMobile ? "100%" : "150px",
+            height: "42px",
             borderRadius: "6px",
-            fontSize: "14px",
-            fontWeight: "500",
-            textTransform: "none",
+
             boxShadow: "none",
             minWidth: "auto",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: isMobile ? "center" : "space-between",
             "&:hover": {
               backgroundColor: "#5a6268",
             },
           }}
         >
-          + ახლის გახსნა
+          <PlusIcon />
+          <Typography
+            sx={{
+              fontSize: "13px",
+              fontWeight: "400",
+              textTransform: "none",
+            }}
+          >
+            ახლის გახსნა
+          </Typography>
         </Button>
       </Box>
 
       <Box
         sx={{
           display: "flex",
-          gap: "20px",
+          flexDirection: isMobile ? "column" : "row",
+          gap: isMobile ? "16px" : "20px",
           marginBottom: "40px",
-          alignItems: "flex-start",
+          alignItems: isMobile ? "stretch" : "flex-start",
         }}
       >
         <Box
           sx={{
-            flex: 1,
+            flex: isMobile ? "none" : 1,
             display: "flex",
             flexDirection: "column",
           }}
         >
-          <TextField
-            multiline
-            rows={12}
+          <TextInput
             value={leftText}
-            onChange={(e) => setLeftText(e.target.value)}
+            onChange={setLeftText}
             placeholder="დაიწყე წერა..."
-            variant="outlined"
-            fullWidth
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                backgroundColor: "white",
-                borderRadius: "8px",
-                "& fieldset": {
-                  borderColor: "#e0e0e0",
-                },
-                "&:hover fieldset": {
-                  borderColor: "#b0b0b0",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "#1976d2",
-                },
-              },
-              "& .MuiInputBase-input": {
-                fontSize: "14px",
-                lineHeight: "1.5",
-              },
-            }}
+            showResults={showResults}
+            diffItems={leftDiff}
           />
         </Box>
 
@@ -166,14 +171,16 @@ const TextComparison: React.FC = () => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            width: "60px",
-            height: "60px",
+            width: isMobile ? "48px" : "60px",
+            height: isMobile ? "48px" : "60px",
             backgroundColor: "white",
             borderRadius: "50%",
-            fontSize: "20px",
+            fontSize: "14px",
+            margin: isMobile ? "0 auto" : "60px 0 0 0",
             color: "#666",
             boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
             marginTop: "60px",
+            transform: isMobile ? "rotate(90deg)" : "none",
           }}
         >
           ⟷
@@ -181,65 +188,77 @@ const TextComparison: React.FC = () => {
 
         <Box
           sx={{
-            flex: 1,
+            flex: isMobile ? "none" : 1,
             display: "flex",
             flexDirection: "column",
           }}
         >
-          <TextField
-            multiline
-            rows={12}
+          <TextInput
             value={rightText}
-            onChange={(e) => setRightText(e.target.value)}
+            onChange={setRightText}
             placeholder="დაიწყე წერა..."
-            variant="outlined"
-            fullWidth
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                backgroundColor: "white",
-                borderRadius: "8px",
-                "& fieldset": {
-                  borderColor: "#e0e0e0",
-                },
-                "&:hover fieldset": {
-                  borderColor: "#b0b0b0",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "#1976d2",
-                },
-              },
-              "& .MuiInputBase-input": {
-                fontSize: "14px",
-                lineHeight: "1.5",
-              },
-            }}
+            showResults={showResults}
+            diffItems={rightDiff}
           />
         </Box>
       </Box>
 
-      <Box sx={{ display: "flex", justifyContent: "center" }}>
-        <Button
-          onClick={handleCompare}
-          sx={{
-            backgroundColor: "#6c757d",
-            color: "white",
-            padding: "12px 40px",
-            borderRadius: "8px",
-            fontSize: "16px",
-            fontWeight: "500",
-            textTransform: "none",
-            boxShadow: "none",
-            "&:hover": {
-              backgroundColor: "#5a6268",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-            },
-            "&:active": {
-              boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
-            },
-          }}
-        >
-          შედარება
-        </Button>
+      <Box sx={{ display: "flex", justifyContent: "center", gap: "16px" }}>
+        {!showResults ? (
+          <Button
+            onClick={handleCompare}
+            disabled={!leftText.trim() || !rightText.trim()}
+            sx={{
+              backgroundColor: leftText && rightText ? "#4571E4" : "#6c757d",
+              color: "white",
+              padding: isMobile ? "10px 30px" : "12px 40px",
+              width: isMobile ? "100%" : "auto",
+              borderRadius: "8px",
+              fontSize: "14px",
+              fontWeight: "500",
+              textTransform: "none",
+              boxShadow: "none",
+              "&:hover": {
+                backgroundColor: leftText && rightText ? "#365abd" : "#5a6268",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+              },
+              "&:active": {
+                boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
+              },
+              "&:disabled": {
+                backgroundColor: "#6c757d",
+                color: "white",
+              },
+            }}
+          >
+            შედარება
+          </Button>
+        ) : (
+          <Button
+            onClick={() => setShowResults(false)}
+            sx={{
+              backgroundColor: "#4571E4",
+              color: "white",
+              padding: isMobile ? "10px 30px" : "12px 40px",
+              width: isMobile ? "100%" : "auto",
+              borderRadius: "8px",
+              fontSize: "14px",
+              fontWeight: "500",
+              textTransform: "none",
+              boxShadow: "none",
+              "&:hover": {
+                backgroundColor: "#365abd",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+              },
+              "&:active": {
+                boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
+              },
+            }}
+          >
+            <RefreshIcon />
+            შედარება
+          </Button>
+        )}
       </Box>
     </Box>
   );
